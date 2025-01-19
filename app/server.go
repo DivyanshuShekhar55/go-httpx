@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+
+	"github.com/DivyanshuShekhar55/go-htttpx/app/internals/path"
 )
 
 func main() {
@@ -33,14 +35,23 @@ func main() {
 		fmt.Println("error while reading the request buffer")
 	}
 
+	
 	// buffer is a long sequence of bytes (like 12 17 ... 0 0 ...0)
 	// convert it to readable string, using the bytes package
 	buf := bytes.NewBuffer(buffer)
-	fmt.Println(buf.String())
+	//fmt.Println(buf.String()) returns full req string
 
-	// write a message to this connection
-	// any simple msg string will not work because the testing tools like curl or postman will read http response only, so we need to send a HTTP compliant response
-	msg := "HTTP/1.1 200 OK\r\n\r\n"
+	// build the route matcher :
+	var msg string
+	// get the exact route
+	route := path.GetPath(buf.String())
+
+	switch route {
+	case "/":
+		msg = "HTTP/1.1 200 OK\r\n\r\n"
+	default:
+		msg = "HTTP/1.1 404 Not Found\r\n\r\n"
+	}
 
 	_, err = conn.Write([]byte(msg))
 	if err != nil {
