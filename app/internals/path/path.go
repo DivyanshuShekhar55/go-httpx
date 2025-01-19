@@ -19,7 +19,7 @@ func GetPath(fullString string) (reqPath string) {
 // following func works like this ...
 // if full route is /echo/abc/hello and num of Paths to be ignored is 2
 // then returns /hello as /echo and /abc are ignored
-func nestedPath(fullRoute string, numOfPathsIgnored int) (nestedRoute string) {
+func NestedPath(fullRoute string, numOfPathsIgnored int) (nestedRoute string) {
 	slash_separated_route := strings.Split(fullRoute, "/")
 
 	var parent_route_ignored string
