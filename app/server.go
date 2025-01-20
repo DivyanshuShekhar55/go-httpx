@@ -29,29 +29,21 @@ func main() {
 
 	// Next, lets get the url requested, a GET looks like this :GET /index.html HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/7.64.1\r\nAccept: */*\r\n\r\n
 	// send 404 for any other path than the home route
-	buffer := make([]byte, 1024)
+	buffer := make([]byte, 10240)
 	_, err = conn.Read(buffer)
 	if err != nil {
 		fmt.Println("error while reading the request buffer")
 	}
 
-	
+
 	// buffer is a long sequence of bytes (like 12 17 ... 0 0 ...0)
 	// convert it to readable string, using the bytes package
 	buf := bytes.NewBuffer(buffer)
 	//fmt.Println(buf.String()) returns full req string
 
-	// build the route matcher :
-	var msg string
-	// get the exact route
-	route := path.GetPath(buf.String())
 
-	switch route {
-	case "/":
-		msg = "HTTP/1.1 200 OK\r\n\r\n"
-	default:
-		msg = "HTTP/1.1 404 Not Found\r\n\r\n"
-	}
+	route := path.GetPath(buf.String())
+	msg := Router(route)
 
 	_, err = conn.Write([]byte(msg))
 	if err != nil {
