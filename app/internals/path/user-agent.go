@@ -9,6 +9,6 @@ func GetUserAgent(fullString string) (userAgent string) {
 
 	// the above var is like : User-Agent: foobar
 	// again we need to split 
-	userAgent = strings.Split(space_separated_params[2], " ")[1]
+	userAgent = strings.Split(space_separated_params[1], " ")[1]
 	return userAgent
 }
