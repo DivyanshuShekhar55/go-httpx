@@ -35,15 +35,15 @@ func main() {
 		fmt.Println("error while reading the request buffer")
 	}
 
-
+	
 	// buffer is a long sequence of bytes (like 12 17 ... 0 0 ...0)
 	// convert it to readable string, using the bytes package
 	buf := bytes.NewBuffer(buffer)
-	//fmt.Println(buf.String()) returns full req string
-
+	fullString := buf.String() //returns full req string
+	fmt.Println(fullString)
 
 	route := path.GetPath(buf.String())
-	msg := Router(route)
+	msg := Router(route, fullString)
 
 	_, err = conn.Write([]byte(msg))
 	if err != nil {
