@@ -12,6 +12,9 @@ type Pool struct {
 	wg         sync.WaitGroup
 }
 
+// whenever a new pool is created it will create an array of workers
+// then each worker in array is put in the job-channel
+// the worker.go file handles the Start func. which basically handles the job/task
 func NewPool(maxWorkers int) *Pool {
 
 	// init a job-queue/channel which can accomodate 'n' number of connections at a go (n=maxWorkers*2)
@@ -37,4 +40,23 @@ func NewPool(maxWorkers int) *Pool {
 	}
 
 	return pool
+}
+
+// following func is used to push a connection in the job channel
+func (p *Pool) Submit(conn net.Conn) {
+	p.jobQueue <- conn
+}
+
+func (p *Pool) Stop() {
+
+	// close the job queue
+	close(p.jobQueue)
+
+	// stop all workers
+	for _, worker := range p.workers {
+		worker.Stop()
+	}
+
+	// wait for all workers to finish
+	p.wg.Wait()
 }
