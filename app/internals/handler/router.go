@@ -1,10 +1,11 @@
-package handler 
+package handler
 
 import (
 	"fmt"
 	"strconv"
 	"strings"
 
+	"github.com/DivyanshuShekhar55/go-htttpx/app/internals/filehandler"
 	"github.com/DivyanshuShekhar55/go-htttpx/app/internals/path"
 )
 
@@ -28,7 +29,15 @@ func Router(route string, fullString string) (msg string) {
 		msg = fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %s\r\n\r\n%s", content_len, content)
 
 	case strings.HasPrefix(route, "/file"):
-		
+		file_name := path.NestedPath(route, 1)
+		fmt.Println(file_name)
+		content, err := filehandler.GetFile(file_name)
+		if err != nil {
+			msg = "HTTP/1.1 404 Not Found\r\n\r\n"
+			return
+		}
+		content_len := strconv.Itoa(len(content))
+		msg = fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %s\r\n\r\n%s", content_len, content)
 
 	default:
 		msg = "HTTP/1.1 404 Not Found\r\n\r\n"
