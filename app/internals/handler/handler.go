@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/DivyanshuShekhar55/go-htttpx/app/internals/path"
+	"github.com/DivyanshuShekhar55/go-htttpx/app/internals/req"
 )
 
 func HandleReq(conn net.Conn) {
@@ -26,8 +26,8 @@ func HandleReq(conn net.Conn) {
 	fullString := buf.String() //returns full req string
 	// fmt.Println(fullString)
 
-	route := path.GetPath(buf.String())
-	method := path.Method(fullString)
+	route := req.GetPath(buf.String())
+	method := req.Method(fullString)
 
 	var res string // response message 
 
@@ -35,7 +35,7 @@ func HandleReq(conn net.Conn) {
 	case "GET":
 		res = Get(route, fullString)
 	case "POST":
-		
+
 	}
 
 	_, err = conn.Write([]byte(res))
