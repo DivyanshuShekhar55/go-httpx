@@ -34,8 +34,8 @@ func HandleReq(conn net.Conn) {
 	switch method {
 	case "GET":
 		res = Get(route, fullString)
-	case "POST":
-
+	case "POST" :
+		res = Post(route, fullString)
 	}
 
 	_, err = conn.Write([]byte(res))
