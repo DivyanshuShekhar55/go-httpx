@@ -6,7 +6,6 @@ import (
 	"net"
 
 	"github.com/DivyanshuShekhar55/go-htttpx/app/internals/path"
-
 )
 
 func HandleReq(conn net.Conn) {
@@ -28,7 +27,16 @@ func HandleReq(conn net.Conn) {
 	// fmt.Println(fullString)
 
 	route := path.GetPath(buf.String())
-	res := Router(route, fullString)
+	method := path.Method(fullString)
+
+	var res string // response message 
+
+	switch method {
+	case "GET":
+		res = Get(route, fullString)
+	case "POST":
+		
+	}
 
 	_, err = conn.Write([]byte(res))
 	if err != nil {
