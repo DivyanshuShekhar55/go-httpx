@@ -27,6 +27,9 @@ func Router(route string, fullString string) (msg string) {
 
 		msg = fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %s\r\n\r\n%s", content_len, content)
 
+	case strings.HasPrefix(route, "/file"):
+		
+
 	default:
 		msg = "HTTP/1.1 404 Not Found\r\n\r\n"
 	}
