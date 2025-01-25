@@ -12,6 +12,17 @@ import (
 
 func Get(route string, fullString string) (msg string) {
 
+	// create an empty header, this common header will be modified for each route
+	resHeader := types.Header{
+		Fields: map[string]string{},
+	}
+
+	reqHeader := req.Headers(fullString)
+	encoding, ok := reqHeader.Fields["Content-Encoding"]
+	if ok && encoding == "gzip" {
+		resHeader = *types.AddHeader("Content-Encoding", "gzip", &resHeader)
+	}
+
 	switch {
 	case route == "/":
 		msg = types.NewResponse(200, types.NewTextHeader(), "ok")
@@ -20,14 +31,11 @@ func Get(route string, fullString string) (msg string) {
 
 		content := req.NestedPath(route, 1)
 		content_len := strconv.Itoa(len(content))
-		header := types.Header{
-			Fields: map[string]string{
-				"Content-Type":   "text/plain",
-				"Content-Length": string(content_len),
-			},
-		}
 
-		msg = types.NewResponse(200, header, content)
+		resHeader = *types.AddHeader("Content-Type", "text/plain", &resHeader)
+		resHeader = *types.AddHeader("Content-Length", string(content_len), &resHeader)
+
+		msg = types.NewResponse(200, resHeader, content)
 
 	case route == "/user-agent":
 
