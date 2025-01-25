@@ -18,7 +18,7 @@ func Get(route string, fullString string) (msg string) {
 	}
 
 	reqHeader := req.Headers(fullString)
-	encoding, ok := reqHeader.Fields["Content-Encoding"]
+	encoding, ok := reqHeader.Fields["Accept-Encoding"]
 	if ok && encoding == "gzip" {
 		resHeader = *types.AddHeader("Content-Encoding", "gzip", &resHeader)
 	}
