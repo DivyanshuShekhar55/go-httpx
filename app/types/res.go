@@ -66,3 +66,8 @@ func NewTextHeader() Header {
 	}
 	return textHeader
 }
+
+func AddHeader(key, value string, header *Header) *Header{
+	header.Fields[key] = value
+	return header
+}
