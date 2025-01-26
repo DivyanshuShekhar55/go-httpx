@@ -26,9 +26,11 @@ func Get(route string, fullString string) (msg string) {
 		resHeader = *types.AddHeader("Content-Encoding", "gzip", &resHeader)
 	}
 
+	// *** here we have added gzip compression to all body, but it should be only applied if in req body ***
+
 	switch {
 	case route == "/":
-		resBody = compression.AddGZip("ok") 
+		resBody = compression.AddGZip("ok")
 		msg = types.NewResponse(200, types.NewTextHeader(), resBody)
 
 	case strings.HasPrefix(route, "/echo"):
@@ -48,7 +50,11 @@ func Get(route string, fullString string) (msg string) {
 		content := req.GetUserAgent(fullString)
 		content_len := strconv.Itoa(len(content))
 
-		msg = fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %s\r\n\r\n%s", content_len, content)
+		resBody = compression.AddGZip(content)
+		resHeader = *types.AddHeader("Content-Type", "text/plain", &resHeader)
+		resHeader = *types.AddHeader("Content-Length", string(content_len), &resHeader)
+
+		msg = types.NewResponse(200, resHeader, resBody)
 
 	case strings.HasPrefix(route, "/file"):
 		file_name := req.NestedPath(route, 1)
@@ -59,10 +65,15 @@ func Get(route string, fullString string) (msg string) {
 			return
 		}
 		content_len := strconv.Itoa(len(content))
-		msg = fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %s\r\n\r\n%s", content_len, content)
+
+		resBody = compression.AddGZip(string(content))
+		resHeader = *types.AddHeader("Content-Type", "application/octet-stream", &resHeader)
+		resHeader = *types.AddHeader("Content-Length", string(content_len), &resHeader)
+
+		msg = types.NewResponse(200, resHeader, resBody)
 
 	default:
-		msg = "HTTP/1.1 404 Not Found\r\n\r\n"
+		msg = types.NewResponse(404, resHeader, "")
 	}
 
 	return msg
