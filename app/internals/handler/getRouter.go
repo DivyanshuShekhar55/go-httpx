@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/DivyanshuShekhar55/go-htttpx/app/internals/compression"
 	"github.com/DivyanshuShekhar55/go-htttpx/app/internals/filehandler"
 	"github.com/DivyanshuShekhar55/go-htttpx/app/internals/req"
 	"github.com/DivyanshuShekhar55/go-htttpx/app/types"
@@ -17,6 +18,8 @@ func Get(route string, fullString string) (msg string) {
 		Fields: map[string]string{},
 	}
 
+	var resBody string
+
 	reqHeader := req.Headers(fullString)
 	encoding, ok := reqHeader.Fields["Accept-Encoding"]
 	if ok && encoding == "gzip" {
@@ -25,7 +28,8 @@ func Get(route string, fullString string) (msg string) {
 
 	switch {
 	case route == "/":
-		msg = types.NewResponse(200, types.NewTextHeader(), "ok")
+		resBody = compression.AddGZip("ok") 
+		msg = types.NewResponse(200, types.NewTextHeader(), resBody)
 
 	case strings.HasPrefix(route, "/echo"):
 
@@ -35,7 +39,8 @@ func Get(route string, fullString string) (msg string) {
 		resHeader = *types.AddHeader("Content-Type", "text/plain", &resHeader)
 		resHeader = *types.AddHeader("Content-Length", string(content_len), &resHeader)
 
-		msg = types.NewResponse(200, resHeader, content)
+		resBody = compression.AddGZip(content)
+		msg = types.NewResponse(200, resHeader, resBody)
 
 	case route == "/user-agent":
 
